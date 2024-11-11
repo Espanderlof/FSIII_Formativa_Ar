@@ -1,4 +1,4 @@
-package com.duoc.duoc;
+package com.duoc.back_libros;
 
 /**
  * Hello world!
