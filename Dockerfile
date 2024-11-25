@@ -1,5 +1,4 @@
 # Usar una imagen base de JDK para construir la aplicación
-# Usamos una imagen base con Java 17
 FROM eclipse-temurin:17-jdk-focal AS buildstage 
 
 RUN apt-get update && apt-get install -y maven
@@ -13,15 +12,21 @@ COPY pom.xml .
 # Copiar el código fuente
 COPY src /app/src
 
+# Copiar la carpeta de la wallet
+COPY Wallet_RNDBN3TSBMN53C36 /app/Wallet_RNDBN3TSBMN53C36
+
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:17-jdk-focal
 
-# Copia el archivo jar al contenedor
-COPY --from=buildstage /app/target/web_recetas-0.0.1-SNAPSHOT.jar /app/app.jar
+WORKDIR /app
 
-# Exponer el puerto 8080 (puerto típico de Spring Boot)
-EXPOSE 8080
+# Copia el archivo jar y la wallet al contenedor final
+COPY --from=buildstage /app/target/back_libros-1.0-SNAPSHOT.jar /app/app.jar
+COPY --from=buildstage /app/Wallet_RNDBN3TSBMN53C36 /app/Wallet_RNDBN3TSBMN53C36
+
+# Exponer el puerto 8081
+EXPOSE 8081
 
 # Comando para ejecutar la aplicación
-CMD ["java", "-jar", "/app/app.jar"]
+CMD ["java", "-jar", "app.jar"]
